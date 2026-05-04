@@ -1,0 +1,111 @@
+package com.leman.chatservice.controller;
+
+import static com.leman.chatservice.constant.AuthTestConstant.ACCESS_TOKEN;
+import static com.leman.chatservice.constant.AuthTestConstant.LOGIN_REQUEST;
+import static com.leman.chatservice.constant.AuthTestConstant.LOGIN_RESPONSE;
+import static com.leman.chatservice.constant.AuthTestConstant.REFRESH_TOKEN;
+import static com.leman.chatservice.constant.AuthTestConstant.REGISTER_REQUEST;
+import static com.leman.chatservice.constant.AuthTestConstant.USER_RESPONSE;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.times;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.leman.chatservice.annotation.ExcludeSecurityWebMvcTest;
+import com.leman.chatservice.constant.ApplicationConstant;
+import com.leman.chatservice.dto.request.LoginRequest;
+import com.leman.chatservice.dto.request.RegisterRequest;
+import com.leman.chatservice.dto.response.LoginResponse;
+import com.leman.chatservice.dto.response.UserResponse;
+import com.leman.chatservice.security.JwtService;
+import com.leman.chatservice.service.AuthService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+@ExcludeSecurityWebMvcTest(controllers = AuthController.class)
+@AutoConfigureJsonTesters
+class AuthControllerTest {
+
+    private static final String BASE_PATH = "/api/v1/auth";
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private AuthService authService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @Autowired
+    private JacksonTester<RegisterRequest> registerTester;
+
+    @Autowired
+    private JacksonTester<LoginRequest> loginTester;
+
+    @Autowired
+    private JacksonTester<UserResponse> userResponseTester;
+
+    @Autowired
+    private JacksonTester<LoginResponse> loginResponseTester;
+
+    @Test
+    void register_ShouldReturn_Success() throws Exception {
+        given(authService.registerUser(REGISTER_REQUEST)).willReturn(USER_RESPONSE);
+
+        mockMvc.perform(post(BASE_PATH + "/register")
+                        .content(registerTester.write(REGISTER_REQUEST).getJson())
+                        .contentType("application/json"))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(userResponseTester.write(USER_RESPONSE).getJson()));
+
+        then(authService).should(times(1)).registerUser(REGISTER_REQUEST);
+    }
+
+    @Test
+    void login_ShouldReturn_Success() throws Exception {
+        given(authService.login(LOGIN_REQUEST)).willReturn(LOGIN_RESPONSE);
+
+        mockMvc.perform(post(BASE_PATH + "/login")
+                        .content(loginTester.write(LOGIN_REQUEST).getJson())
+                        .contentType("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(loginResponseTester.write(LOGIN_RESPONSE).getJson()));
+
+        then(authService).should(times(1)).login(LOGIN_REQUEST);
+    }
+
+    @Test
+    void refresh_ShouldReturn_Success() throws Exception {
+        given(authService.refreshToken(REFRESH_TOKEN)).willReturn(LOGIN_RESPONSE);
+
+        mockMvc.perform(post(BASE_PATH + "/refresh")
+                        .header(ApplicationConstant.HttpHeader.REFRESH_TOKEN, REFRESH_TOKEN)
+                        .contentType("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(loginResponseTester.write(LOGIN_RESPONSE).getJson()));
+
+        then(authService).should(times(1)).refreshToken(REFRESH_TOKEN);
+    }
+
+    @Test
+    void logout_ShouldReturn_Success() throws Exception {
+        willDoNothing().given(authService).logout(ACCESS_TOKEN);
+
+        mockMvc.perform(post(BASE_PATH + "/logout")
+                        .header(ApplicationConstant.HttpHeader.AUTHORIZATION, "Bearer " + ACCESS_TOKEN)
+                        .contentType("application/json"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
+        then(authService).should(times(1)).logout(ACCESS_TOKEN);
+    }
+
+}

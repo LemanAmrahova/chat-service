@@ -1,0 +1,20 @@
+package com.leman.chatservice.exception.constant;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ErrorMessage {
+
+    public static final String UNAUTHORIZED_ERROR_MESSAGE = "Authentication required";
+    public static final String FORBIDDEN_ERROR_MESSAGE = "Access denied";
+    public static final String INVALID_REFRESH_TOKEN = "Invalid or expired refresh token";
+    public static final String TOKEN_MALFORMED = "Token format is invalid";
+    public static final String RESOURCE_NOT_FOUND_ERROR_MESSAGE = "{0} not found with {1} - {2}";
+    public static final String RESOURCE_ALREADY_EXISTS_ERROR_MESSAGE = "{0} already exists with {1} - {2}";
+    public static final String INVALID_JSON_ERROR_MESSAGE = "Malformed JSON request";
+    public static final String INVALID_CURRENT_PASSWORD_ERROR_MESSAGE= "Current password is incorrect";
+    public static final String SAME_PASSWORD_ERROR_MESSAGE = "New password must be different from current password";
+    public static final String INVALID_CREDENTIALS_ERROR_MESSAGE = "Invalid username or password";
+
+}

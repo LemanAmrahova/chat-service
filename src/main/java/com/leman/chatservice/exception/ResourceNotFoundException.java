@@ -1,0 +1,27 @@
+package com.leman.chatservice.exception;
+
+import com.leman.chatservice.exception.constant.ErrorMessage;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import java.text.MessageFormat;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class ResourceNotFoundException extends RuntimeException {
+
+    private final String entity;
+    private final String field;
+    private final Object value;
+
+    private ResourceNotFoundException(String entity, String field, Object value) {
+        super(MessageFormat.format(ErrorMessage.RESOURCE_NOT_FOUND_ERROR_MESSAGE, entity, field, value));
+        this.entity = entity;
+        this.field = field;
+        this.value = value;
+    }
+
+    public static ResourceNotFoundException of(String entity, String field, Object value) {
+        return new ResourceNotFoundException(entity, field, value);
+    }
+
+}

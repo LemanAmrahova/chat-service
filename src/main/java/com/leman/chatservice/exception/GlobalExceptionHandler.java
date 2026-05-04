@@ -1,0 +1,110 @@
+package com.leman.chatservice.exception;
+
+import com.leman.chatservice.exception.constant.ErrorCode;
+import com.leman.chatservice.exception.constant.ErrorMessage;
+import com.leman.chatservice.exception.constant.ErrorType;
+import com.leman.chatservice.exception.dto.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.util.stream.Collectors;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    private ResponseEntity<ErrorResponse> buildErrorResponse(String code, String type, String message,
+                                                             HttpServletRequest request, HttpStatus status) {
+        return ResponseEntity.status(status).body(
+                ErrorResponse.builder()
+                        .errorCode(code)
+                        .errorType(type)
+                        .errorMessage(message)
+                        .path(request.getRequestURI())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex, HttpServletRequest request) {
+        return buildErrorResponse(ErrorCode.UNAUTHORIZED, ErrorType.UNAUTHORIZED,
+                ex.getMessage(), request, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
+        return buildErrorResponse(ErrorCode.UNAUTHORIZED, ErrorType.UNAUTHORIZED,
+                ErrorMessage.INVALID_CREDENTIALS_ERROR_MESSAGE, request, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex, HttpServletRequest request) {
+        return buildErrorResponse(ErrorCode.BAD_REQUEST, ErrorType.BAD_REQUEST,
+                ex.getMessage(), request, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex,
+                                                                HttpServletRequest request) {
+        String message = MessageFormat.format(ErrorMessage.RESOURCE_NOT_FOUND_ERROR_MESSAGE,
+                ex.getEntity(), ex.getField(), ex.getValue());
+        String code = MessageFormat.format(ErrorCode.RESOURCE_NOT_FOUND, ex.getEntity().toLowerCase());
+
+        return buildErrorResponse(code, ErrorType.NOT_FOUND, message, request, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateResource(DuplicateResourceException ex,
+                                                                 HttpServletRequest request) {
+        String message = MessageFormat.format(ErrorMessage.RESOURCE_ALREADY_EXISTS_ERROR_MESSAGE,
+                ex.getEntity(), ex.getField(), ex.getValue());
+        String code = MessageFormat.format(ErrorCode.RESOURCE_ALREADY_EXISTS, ex.getEntity().toLowerCase());
+
+        return buildErrorResponse(code, ErrorType.CONFLICT, message, request, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex,
+                                                                    HttpServletRequest request) {
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + " " + error.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+
+        return buildErrorResponse(ErrorCode.VALIDATION_ERROR, ErrorType.BAD_REQUEST,
+                message, request, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex,
+                                                                            HttpServletRequest request) {
+        String message = ex.getConstraintViolations()
+                .stream()
+                .map(v -> {
+                    String field = v.getPropertyPath().toString();
+                    field = field.contains(".") ? field.substring(field.lastIndexOf('.') + 1) : field;
+                    return field + " " + v.getMessage();
+                })
+                .collect(Collectors.joining("; "));
+
+        return buildErrorResponse(ErrorCode.VALIDATION_ERROR, ErrorType.BAD_REQUEST,
+                message, request, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+                                                                      HttpServletRequest request) {
+        return buildErrorResponse(ErrorCode.INVALID_JSON, ErrorType.BAD_REQUEST,
+                ErrorMessage.INVALID_JSON_ERROR_MESSAGE, request, HttpStatus.BAD_REQUEST);
+    }
+
+}
