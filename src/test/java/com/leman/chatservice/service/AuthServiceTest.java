@@ -25,7 +25,7 @@ import com.leman.chatservice.constant.ApplicationConstant;
 import com.leman.chatservice.dto.response.LoginResponse;
 import com.leman.chatservice.dto.response.UserResponse;
 import com.leman.chatservice.entity.User;
-import com.leman.chatservice.enums.Role;
+import com.leman.chatservice.enums.UserRole;
 import com.leman.chatservice.exception.DuplicateResourceException;
 import com.leman.chatservice.exception.ResourceNotFoundException;
 import com.leman.chatservice.exception.UnauthorizedException;
@@ -101,7 +101,7 @@ class AuthServiceTest {
         then(passwordEncoder).should(times(1)).encode(REGISTER_REQUEST.getPassword());
 
         assertEquals(ENCODED_PASSWORD, userCaptor.getValue().getPassword());
-        assertEquals(Role.USER, userCaptor.getValue().getRole());
+        assertEquals(UserRole.USER, userCaptor.getValue().getRole());
     }
 
     @Test

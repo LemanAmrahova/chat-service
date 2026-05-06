@@ -1,6 +1,6 @@
 package com.leman.chatservice.dto.request;
 
-import com.leman.chatservice.enums.Role;
+import com.leman.chatservice.enums.UserRole;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +19,7 @@ public class UserFilterRequest extends PageableRequest {
     private String username;
 
     private String email;
-    private Role role;
+    private UserRole role;
     private Boolean enabled;
 
 }
