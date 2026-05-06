@@ -2,7 +2,6 @@ package com.leman.chatservice.security.handler;
 
 import static com.leman.chatservice.exception.constant.ErrorMessage.UNAUTHORIZED_ERROR_MESSAGE;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leman.chatservice.exception.constant.ErrorCode;
 import com.leman.chatservice.exception.constant.ErrorType;
 import com.leman.chatservice.exception.dto.ErrorResponse;
@@ -14,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor
