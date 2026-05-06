@@ -7,7 +7,7 @@ import static com.leman.chatservice.constant.UserTestConstant.USER_FILTER_REQUES
 import static com.leman.chatservice.constant.UserTestConstant.USER_ID;
 import static com.leman.chatservice.constant.UserTestConstant.USER_RESPONSE;
 import static com.leman.chatservice.constant.UserTestConstant.USER_UPDATE_REQUEST;
-import static com.leman.chatservice.enums.Role.ADMIN;
+import static com.leman.chatservice.enums.UserRole.ADMIN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

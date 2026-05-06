@@ -1,11 +1,7 @@
 package com.leman.chatservice.entity;
 
-import com.leman.chatservice.enums.Role;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import com.leman.chatservice.enums.UserRole;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,10 +33,11 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
-    private Role role = Role.USER;
+    private UserRole role = UserRole.USER;
 
     @NotNull
     @Column(nullable = false)
+    @Builder.Default
     private boolean enabled = true;
 
 }

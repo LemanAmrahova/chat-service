@@ -5,14 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.LastModifiedDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -31,7 +30,6 @@ public class BaseEntity {
 
     @Column(nullable = false)
     @UpdateTimestamp
-    @LastModifiedDate
     private LocalDateTime updatedAt;
 
 }

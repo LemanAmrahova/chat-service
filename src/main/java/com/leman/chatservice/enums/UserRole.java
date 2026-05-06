@@ -1,6 +1,6 @@
 package com.leman.chatservice.enums;
 
-public enum Role {
+public enum UserRole {
 
     USER, ADMIN
 

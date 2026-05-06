@@ -1,6 +1,6 @@
 package com.leman.chatservice.dto.response;
 
-import com.leman.chatservice.enums.Role;
+import com.leman.chatservice.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +16,7 @@ public class UserResponse {
     private Long id;
     private String username;
     private String email;
-    private Role role;
+    private UserRole role;
     private Boolean enabled;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

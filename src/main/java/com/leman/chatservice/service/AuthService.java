@@ -10,7 +10,7 @@ import com.leman.chatservice.dto.request.RegisterRequest;
 import com.leman.chatservice.dto.response.LoginResponse;
 import com.leman.chatservice.dto.response.UserResponse;
 import com.leman.chatservice.entity.User;
-import com.leman.chatservice.enums.Role;
+import com.leman.chatservice.enums.UserRole;
 import com.leman.chatservice.exception.DuplicateResourceException;
 import com.leman.chatservice.exception.ResourceNotFoundException;
 import com.leman.chatservice.exception.UnauthorizedException;
@@ -107,7 +107,7 @@ public class AuthService {
     private User createUserFromRequest(RegisterRequest request) {
         User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.USER);
+        user.setRole(UserRole.USER);
 
         return user;
     }

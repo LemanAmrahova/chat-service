@@ -12,7 +12,7 @@ import com.leman.chatservice.dto.request.UserFilterRequest;
 import com.leman.chatservice.dto.request.UserUpdateRequest;
 import com.leman.chatservice.dto.response.UserResponse;
 import com.leman.chatservice.entity.User;
-import com.leman.chatservice.enums.Role;
+import com.leman.chatservice.enums.UserRole;
 import com.leman.chatservice.security.UserPrincipal;
 import java.time.LocalDateTime;
 
@@ -58,7 +58,7 @@ public final class UserTestConstant {
                 .username(USERNAME)
                 .email(EMAIL)
                 .password(ENCODED_PASSWORD)
-                .role(Role.USER)
+                .role(UserRole.USER)
                 .enabled(true)
                 .createdAt(CREATED_AT)
                 .updatedAt(UPDATED_AT)
@@ -71,7 +71,7 @@ public final class UserTestConstant {
                 .username(USERNAME)
                 .email(EMAIL)
                 .password(PASSWORD)
-                .role(Role.ADMIN)
+                .role(UserRole.ADMIN)
                 .enabled(true)
                 .build();
     }
@@ -80,7 +80,7 @@ public final class UserTestConstant {
             .id(USER_ID)
             .username(USERNAME)
             .email(EMAIL)
-            .role(Role.USER)
+            .role(UserRole.USER)
             .enabled(true)
             .createdAt(CREATED_AT)
             .updatedAt(UPDATED_AT)

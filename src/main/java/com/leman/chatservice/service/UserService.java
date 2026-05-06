@@ -12,7 +12,7 @@ import com.leman.chatservice.dto.request.UserUpdateRequest;
 import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.UserResponse;
 import com.leman.chatservice.entity.User;
-import com.leman.chatservice.enums.Role;
+import com.leman.chatservice.enums.UserRole;
 import com.leman.chatservice.exception.BadRequestException;
 import com.leman.chatservice.exception.DuplicateResourceException;
 import com.leman.chatservice.exception.ResourceNotFoundException;
@@ -79,7 +79,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateRole(Long id, Role role) {
+    public void updateRole(Long id, UserRole role) {
         User user = findActiveUser(id);
 
         user.setRole(role);

@@ -7,7 +7,7 @@ import com.leman.chatservice.dto.request.RegisterRequest;
 import com.leman.chatservice.dto.response.LoginResponse;
 import com.leman.chatservice.dto.response.UserResponse;
 import com.leman.chatservice.entity.User;
-import com.leman.chatservice.enums.Role;
+import com.leman.chatservice.enums.UserRole;
 import java.time.LocalDateTime;
 
 public final class AuthTestConstant {
@@ -18,7 +18,7 @@ public final class AuthTestConstant {
     public static final Long USER_ID = 1L;
     public static final String USERNAME = "testuser";
     public static final String EMAIL = "test@example.com";
-    public static final Role ROLE = Role.ADMIN;
+    public static final UserRole ROLE = UserRole.ADMIN;
     public static final String PASSWORD = "Test123@";
     public static final String ENCODED_PASSWORD = "encoded-password";
     public static final LocalDateTime CREATED_AT = LocalDateTime.of(2024, 1, 1, 10, 0);
