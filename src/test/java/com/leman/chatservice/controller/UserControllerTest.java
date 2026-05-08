@@ -1,10 +1,13 @@
 package com.leman.chatservice.controller;
 
 import static com.leman.chatservice.constant.UserTestConstant.PASSWORD_CHANGE_REQUEST;
+import static com.leman.chatservice.constant.UserTestConstant.USERNAME;
 import static com.leman.chatservice.constant.UserTestConstant.USER_ID;
 import static com.leman.chatservice.constant.UserTestConstant.USER_PRINCIPAL;
 import static com.leman.chatservice.constant.UserTestConstant.USER_RESPONSE;
+import static com.leman.chatservice.constant.UserTestConstant.USER_SEARCH_PAGEABLE_RESPONSE;
 import static com.leman.chatservice.constant.UserTestConstant.USER_UPDATE_REQUEST;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -18,8 +21,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.leman.chatservice.dto.request.PasswordChangeRequest;
+import com.leman.chatservice.dto.request.UserSearchRequest;
 import com.leman.chatservice.dto.request.UserUpdateRequest;
+import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.UserResponse;
+import com.leman.chatservice.dto.response.UserSearchResponse;
 import com.leman.chatservice.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +54,23 @@ class UserControllerTest extends BaseControllerTest {
 
     @Autowired
     private JacksonTester<UserResponse> responseTester;
+
+    @Autowired
+    private JacksonTester<PageableResponse<UserSearchResponse>> searchResponseTester;
+
+    @Test
+    void searchUsers_ShouldReturn_Success() throws Exception {
+        given(userService.searchUsers(any(UserSearchRequest.class))).willReturn(USER_SEARCH_PAGEABLE_RESPONSE);
+
+        mockMvc.perform(get(BASE_PATH)
+                        .param("username", USERNAME)
+                        .with(authentication(new UsernamePasswordAuthenticationToken(
+                                USER_PRINCIPAL, null, USER_PRINCIPAL.getAuthorities()))))
+                .andExpect(status().isOk())
+                .andExpect(content().json(searchResponseTester.write(USER_SEARCH_PAGEABLE_RESPONSE).getJson()));
+
+        then(userService).should(times(1)).searchUsers(any(UserSearchRequest.class));
+    }
 
     @Test
     void getCurrentUser_ShouldReturn_Success() throws Exception {

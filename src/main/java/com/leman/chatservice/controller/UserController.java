@@ -1,8 +1,11 @@
 package com.leman.chatservice.controller;
 
 import com.leman.chatservice.dto.request.PasswordChangeRequest;
+import com.leman.chatservice.dto.request.UserSearchRequest;
 import com.leman.chatservice.dto.request.UserUpdateRequest;
+import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.UserResponse;
+import com.leman.chatservice.dto.response.UserSearchResponse;
 import com.leman.chatservice.security.UserPrincipal;
 import com.leman.chatservice.service.UserService;
 import jakarta.validation.Valid;
@@ -25,6 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping
+    public ResponseEntity<PageableResponse<UserSearchResponse>> searchUsers(@Valid UserSearchRequest request) {
+        return ResponseEntity.ok(userService.searchUsers(request));
+    }
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {

@@ -1,6 +1,5 @@
 package com.leman.chatservice.dto.response;
 
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,13 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse {
+public class UserSearchResponse {
 
     private Long id;
     private String username;
-    private String email;
-    private Boolean enabled;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+//    private boolean online; will be added
 
 }

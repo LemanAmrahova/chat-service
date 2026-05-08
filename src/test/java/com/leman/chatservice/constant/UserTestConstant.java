@@ -1,25 +1,25 @@
 package com.leman.chatservice.constant;
 
-import static com.leman.chatservice.constant.AuthTestConstant.PASSWORD;
-import static com.leman.chatservice.constant.TestConstant.ID;
 import static com.leman.chatservice.constant.TestConstant.PAGE;
 import static com.leman.chatservice.constant.TestConstant.SIZE;
 import static com.leman.chatservice.constant.TestConstant.SORT_BY;
 import static com.leman.chatservice.constant.TestConstant.SORT_DIRECTION;
 
 import com.leman.chatservice.dto.request.PasswordChangeRequest;
-import com.leman.chatservice.dto.request.UserFilterRequest;
+import com.leman.chatservice.dto.request.UserSearchRequest;
 import com.leman.chatservice.dto.request.UserUpdateRequest;
+import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.UserResponse;
+import com.leman.chatservice.dto.response.UserSearchResponse;
 import com.leman.chatservice.entity.User;
-import com.leman.chatservice.enums.UserRole;
 import com.leman.chatservice.security.UserPrincipal;
 import java.time.LocalDateTime;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserTestConstant {
-
-    private UserTestConstant() {
-    }
 
     public static final Long USER_ID = 1L;
     public static final String USERNAME = "testuser";
@@ -35,7 +35,7 @@ public final class UserTestConstant {
             .email(EMAIL)
             .build();
 
-    public static final UserFilterRequest USER_FILTER_REQUEST = UserFilterRequest.builder()
+    public static final UserSearchRequest USER_SEARCH_REQUEST = UserSearchRequest.builder()
             .page(PAGE)
             .size(SIZE)
             .sortBy(SORT_BY)
@@ -58,21 +58,9 @@ public final class UserTestConstant {
                 .username(USERNAME)
                 .email(EMAIL)
                 .password(ENCODED_PASSWORD)
-                .role(UserRole.USER)
                 .enabled(true)
                 .createdAt(CREATED_AT)
                 .updatedAt(UPDATED_AT)
-                .build();
-    }
-
-    public static User adminEntity() {
-        return User.builder()
-                .id(ID)
-                .username(USERNAME)
-                .email(EMAIL)
-                .password(PASSWORD)
-                .role(UserRole.ADMIN)
-                .enabled(true)
                 .build();
     }
 
@@ -80,11 +68,27 @@ public final class UserTestConstant {
             .id(USER_ID)
             .username(USERNAME)
             .email(EMAIL)
-            .role(UserRole.USER)
             .enabled(true)
             .createdAt(CREATED_AT)
             .updatedAt(UPDATED_AT)
             .build();
+
+    public static final UserSearchResponse USER_SEARCH_RESPONSE = UserSearchResponse.builder()
+            .id(USER_ID)
+            .username(USERNAME)
+            .build();
+
+    public static final PageableResponse<UserSearchResponse> USER_SEARCH_PAGEABLE_RESPONSE =
+            PageableResponse.<UserSearchResponse>builder()
+                    .content(List.of(USER_SEARCH_RESPONSE))
+                    .page(PAGE)
+                    .size(SIZE)
+                    .totalElements(1)
+                    .totalPages(1)
+                    .first(true)
+                    .last(true)
+                    .empty(false)
+                    .build();
 
     public static final UserPrincipal USER_PRINCIPAL = new UserPrincipal(userEntity());
 

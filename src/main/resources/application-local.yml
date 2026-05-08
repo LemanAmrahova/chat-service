@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/chat
+    url: jdbc:postgresql://localhost:5432/chat_db
     username: user
     password: password
     hikari:

@@ -7,12 +7,12 @@ import static com.leman.chatservice.exception.constant.ErrorMessage.INVALID_CURR
 import static com.leman.chatservice.exception.constant.ErrorMessage.SAME_PASSWORD_ERROR_MESSAGE;
 
 import com.leman.chatservice.dto.request.PasswordChangeRequest;
-import com.leman.chatservice.dto.request.UserFilterRequest;
+import com.leman.chatservice.dto.request.UserSearchRequest;
 import com.leman.chatservice.dto.request.UserUpdateRequest;
 import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.UserResponse;
+import com.leman.chatservice.dto.response.UserSearchResponse;
 import com.leman.chatservice.entity.User;
-import com.leman.chatservice.enums.UserRole;
 import com.leman.chatservice.exception.BadRequestException;
 import com.leman.chatservice.exception.DuplicateResourceException;
 import com.leman.chatservice.exception.ResourceNotFoundException;
@@ -40,7 +40,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public PageableResponse<UserResponse> findAllUsers(UserFilterRequest request) {
+    public PageableResponse<UserSearchResponse> searchUsers(UserSearchRequest request) {
         Pageable pageable = PaginationUtil.createPageable(request);
         Specification<User> userSpecification = UserSpecification.getSpecification(request);
 
@@ -79,22 +79,6 @@ public class UserService {
     }
 
     @Transactional
-    public void updateRole(Long id, UserRole role) {
-        User user = findActiveUser(id);
-
-        user.setRole(role);
-        log.info("User role updated successfully with ID: {}", id);
-    }
-
-    @Transactional
-    public void updateUserStatus(Long id, Boolean enabled) {
-        User user = findExistingUser(id);
-
-        user.setEnabled(enabled);
-        log.info("User status updated successfully with ID: {}", id);
-    }
-
-    @Transactional
     public void deleteUser(Long id) {
         User user = findExistingUser(id);
 
@@ -104,11 +88,6 @@ public class UserService {
 
     private User findExistingUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> ResourceNotFoundException.of(ENTITY, ID, userId));
-    }
-
-    private User findActiveUser(Long userId) {
-        return userRepository.findByIdAndEnabledTrue(userId)
                 .orElseThrow(() -> ResourceNotFoundException.of(ENTITY, ID, userId));
     }
 
