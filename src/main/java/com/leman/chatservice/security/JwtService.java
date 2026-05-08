@@ -65,27 +65,16 @@ public class JwtService {
                 .compact();
     }
 
-
-    public Long getUserIdFromToken(String token) {
-        String subject = extractAllClaims(token).getSubject();
-        return Long.valueOf(subject);
+    public Claims extractAndValidateClaims(String token) {
+        Claims claims = extractAllClaims(token);
+        if (claims.getExpiration().before(new Date())) {
+            throw new JwtException("Token expired");
+        }
+        return claims;
     }
 
     public String getTokenType(String token) {
         return extractAllClaims(token).get(TOKEN_TYPE_CLAIM, String.class);
-    }
-
-    public boolean validateToken(String token, Long userId) {
-        try {
-            Claims claims = extractAllClaims(token);
-            if (claims.getExpiration().before(new Date())) {
-                return false;
-            }
-            return Long.valueOf(claims.getSubject()).equals(userId);
-        } catch (JwtException e) {
-            log.error("Token validation failed: {}", e.getMessage());
-            return false;
-        }
     }
 
     public String getJtiFromToken(String token) {

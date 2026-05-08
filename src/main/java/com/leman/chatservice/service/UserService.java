@@ -39,18 +39,20 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final PresenceService presenceService;
 
     public PageableResponse<UserSearchResponse> searchUsers(UserSearchRequest request) {
         Pageable pageable = PaginationUtil.createPageable(request);
-        Specification<User> userSpecification = UserSpecification.getSpecification(request);
+        Specification<User> specification = UserSpecification.getSpecification(request);
 
-        return userMapper.toPageableResponse(userRepository.findAll(userSpecification, pageable));
+        return userMapper.toPageableResponse(userRepository.findAll(specification, pageable));
     }
 
     public UserResponse findUserById(Long userId) {
         User user = findExistingUser(userId);
 
-        return userMapper.toResponse(user);
+        boolean online = presenceService.isOnline(userId);
+        return userMapper.toDetailResponse(user, online, online ? null : presenceService.getLastSeen(userId));
     }
 
     @Transactional

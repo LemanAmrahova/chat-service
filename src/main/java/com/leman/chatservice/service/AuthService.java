@@ -19,6 +19,8 @@ import com.leman.chatservice.mapper.UserMapper;
 import com.leman.chatservice.repository.UserRepository;
 import com.leman.chatservice.security.JwtService;
 import com.leman.chatservice.security.TokenBlacklistService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import java.time.Duration;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
@@ -74,8 +76,8 @@ public class AuthService {
     public LoginResponse refreshToken(String refreshToken) {
         validateRefreshTokenType(refreshToken);
 
-        Long userId = jwtService.getUserIdFromToken(refreshToken);
-        validateRefreshToken(refreshToken, userId);
+        Claims claims = jwtService.extractAndValidateClaims(refreshToken);
+        Long userId = Long.valueOf(claims.getSubject());
 
         User user = findExistingUser(userId);
         String newAccessToken = jwtService.generateAccessToken(user);
@@ -123,15 +125,13 @@ public class AuthService {
     }
 
     private void validateRefreshTokenType(String token) {
-        String tokenType = jwtService.getTokenType(token);
-
-        if (!TokenType.REFRESH.equals(tokenType)) {
-            throw UnauthorizedException.of(ErrorMessage.TOKEN_MALFORMED);
-        }
-    }
-
-    private void validateRefreshToken(String token, Long userId) {
-        if (!jwtService.validateToken(token, userId)) {
+        try {
+            Claims claims = jwtService.extractAndValidateClaims(token);
+            String tokenType = claims.get("type", String.class);
+            if (!TokenType.REFRESH.equals(tokenType)) {
+                throw UnauthorizedException.of(ErrorMessage.TOKEN_MALFORMED);
+            }
+        } catch (JwtException e) {
             throw UnauthorizedException.of(ErrorMessage.INVALID_REFRESH_TOKEN);
         }
     }

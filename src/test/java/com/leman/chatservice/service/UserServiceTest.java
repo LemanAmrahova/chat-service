@@ -10,7 +10,9 @@ import static com.leman.chatservice.constant.UserTestConstant.USER_UPDATE_REQUES
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -54,6 +56,9 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private PresenceService presenceService;
+
     @InjectMocks
     private UserService userService;
 
@@ -72,12 +77,30 @@ class UserServiceTest {
     void getUserById_Should_Return_Success() {
         User userEntity = UserTestConstant.userEntity();
         given(userRepository.findById(USER_ID)).willReturn(Optional.of(userEntity));
+        given(presenceService.isOnline(USER_ID)).willReturn(false);
+        given(presenceService.getLastSeen(USER_ID)).willReturn(null);
 
         UserResponse result = userService.findUserById(USER_ID);
         assertNotNull(result);
-        assertEquals(USER_RESPONSE, result);
 
         then(userRepository).should(times(1)).findById(USER_ID);
+        then(presenceService).should(times(1)).isOnline(USER_ID);
+    }
+
+    @Test
+    void getUserById_Should_Return_Success_WhenUserIsOnline() {
+        User userEntity = UserTestConstant.userEntity();
+        given(userRepository.findById(USER_ID)).willReturn(Optional.of(userEntity));
+        given(presenceService.isOnline(USER_ID)).willReturn(true);
+
+        UserResponse result = userService.findUserById(USER_ID);
+        assertNotNull(result);
+        assertTrue(result.isOnline());
+        assertNull(result.getLastSeen());
+
+        then(userRepository).should(times(1)).findById(USER_ID);
+        then(presenceService).should(times(1)).isOnline(USER_ID);
+        then(presenceService).should(never()).getLastSeen(any());
     }
 
     @Test

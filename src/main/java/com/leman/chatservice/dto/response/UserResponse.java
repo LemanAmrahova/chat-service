@@ -1,5 +1,6 @@
 package com.leman.chatservice.dto.response;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,8 @@ public class UserResponse {
     private String username;
     private String email;
     private Boolean enabled;
+    private boolean online;
+    private Instant lastSeen;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

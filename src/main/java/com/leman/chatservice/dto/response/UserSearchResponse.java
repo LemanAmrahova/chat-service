@@ -13,6 +13,5 @@ public class UserSearchResponse {
 
     private Long id;
     private String username;
-//    private boolean online; will be added
 
 }
