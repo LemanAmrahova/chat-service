@@ -3,11 +3,10 @@ package com.leman.chatservice.service;
 import static com.leman.chatservice.constant.UserTestConstant.ENCODED_PASSWORD;
 import static com.leman.chatservice.constant.UserTestConstant.PASSWORD_CHANGE_REQUEST;
 import static com.leman.chatservice.constant.UserTestConstant.SAME_PASSWORD_REQUEST;
-import static com.leman.chatservice.constant.UserTestConstant.USER_FILTER_REQUEST;
 import static com.leman.chatservice.constant.UserTestConstant.USER_ID;
 import static com.leman.chatservice.constant.UserTestConstant.USER_RESPONSE;
+import static com.leman.chatservice.constant.UserTestConstant.USER_SEARCH_REQUEST;
 import static com.leman.chatservice.constant.UserTestConstant.USER_UPDATE_REQUEST;
-import static com.leman.chatservice.enums.UserRole.ADMIN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -23,6 +22,7 @@ import static org.mockito.Mockito.times;
 import com.leman.chatservice.constant.UserTestConstant;
 import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.UserResponse;
+import com.leman.chatservice.dto.response.UserSearchResponse;
 import com.leman.chatservice.entity.User;
 import com.leman.chatservice.exception.BadRequestException;
 import com.leman.chatservice.exception.DuplicateResourceException;
@@ -58,11 +58,11 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    void findAllUsers_Should_Return_Success() {
+    void searchUsers_Should_Return_Success() {
         Page<User> userPage = mock(Page.class);
         given(userRepository.findAll(any(Specification.class), any(Pageable.class))).willReturn(userPage);
 
-        PageableResponse<UserResponse> result = userService.findAllUsers(USER_FILTER_REQUEST);
+        PageableResponse<UserSearchResponse> result = userService.searchUsers(USER_SEARCH_REQUEST);
         assertNotNull(result);
 
         then(userRepository).should(times(1)).findAll(any(Specification.class), any(Pageable.class));
@@ -209,47 +209,6 @@ class UserServiceTest {
         given(userRepository.findById(USER_ID)).willReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> userService.deleteUser(USER_ID));
-
-        then(userRepository).should(times(1)).findById(USER_ID);
-    }
-
-    @Test
-    void updateRole_Should_Return_Success() {
-        User userEntity = UserTestConstant.userEntity();
-        given(userRepository.findByIdAndEnabledTrue(USER_ID)).willReturn(Optional.of(userEntity));
-
-        userService.updateRole(USER_ID, ADMIN);
-        assertEquals(ADMIN, userEntity.getRole());
-
-        then(userRepository).should(times(1)).findByIdAndEnabledTrue(USER_ID);
-    }
-
-    @Test
-    void updateRole_Should_Throw_ResourceNotFoundException_WhenUserNotFound() {
-        given(userRepository.findByIdAndEnabledTrue(USER_ID)).willReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> userService.updateRole(USER_ID, ADMIN));
-
-        then(userRepository).should(times(1)).findByIdAndEnabledTrue(USER_ID);
-    }
-
-    @Test
-    void updateUserStatus_Should_Return_Success() {
-        User userEntity = UserTestConstant.userEntity();
-        given(userRepository.findById(USER_ID)).willReturn(Optional.of(userEntity));
-
-        userService.updateUserStatus(USER_ID, false);
-        assertFalse(userEntity.isEnabled());
-
-        then(userRepository).should(times(1)).findById(USER_ID);
-        then(userRepository).shouldHaveNoMoreInteractions();
-    }
-
-    @Test
-    void updateUserStatus_Should_Throw_ResourceNotFoundException_WhenUserNotFound() {
-        given(userRepository.findById(USER_ID)).willReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> userService.updateUserStatus(USER_ID, false));
 
         then(userRepository).should(times(1)).findById(USER_ID);
     }

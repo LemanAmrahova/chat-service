@@ -1,7 +1,8 @@
 package com.leman.chatservice.entity;
 
-import com.leman.chatservice.enums.UserRole;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,12 +29,6 @@ public class User extends BaseEntity {
     @NotNull
     @Column(nullable = false)
     private String password;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    @Builder.Default
-    private UserRole role = UserRole.USER;
 
     @NotNull
     @Column(nullable = false)

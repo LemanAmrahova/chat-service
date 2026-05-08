@@ -7,18 +7,16 @@ import com.leman.chatservice.dto.request.RegisterRequest;
 import com.leman.chatservice.dto.response.LoginResponse;
 import com.leman.chatservice.dto.response.UserResponse;
 import com.leman.chatservice.entity.User;
-import com.leman.chatservice.enums.UserRole;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthTestConstant {
-
-    private AuthTestConstant() {
-    }
 
     public static final Long USER_ID = 1L;
     public static final String USERNAME = "testuser";
     public static final String EMAIL = "test@example.com";
-    public static final UserRole ROLE = UserRole.ADMIN;
     public static final String PASSWORD = "Test123@";
     public static final String ENCODED_PASSWORD = "encoded-password";
     public static final LocalDateTime CREATED_AT = LocalDateTime.of(2024, 1, 1, 10, 0);
@@ -43,7 +41,6 @@ public final class AuthTestConstant {
             .id(ID)
             .username(USERNAME)
             .email(EMAIL)
-            .role(ROLE)
             .password(ENCODED_PASSWORD)
             .enabled(true)
             .createdAt(CREATED_AT)
@@ -54,7 +51,6 @@ public final class AuthTestConstant {
             .id(ID)
             .username(USERNAME)
             .email(EMAIL)
-            .role(ROLE)
             .enabled(true)
             .createdAt(CREATED_AT)
             .updatedAt(UPDATED_AT)
