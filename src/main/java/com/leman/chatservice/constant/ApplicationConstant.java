@@ -31,7 +31,8 @@ public final class ApplicationConstant {
                 "/api/v1/auth/**",
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
-                "/error"
+                "/error",
+                "/ws/**"
         );
     }
 

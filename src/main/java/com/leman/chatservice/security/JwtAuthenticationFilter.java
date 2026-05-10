@@ -2,6 +2,7 @@ package com.leman.chatservice.security;
 
 import com.leman.chatservice.constant.ApplicationConstant.HttpAttribute;
 import com.leman.chatservice.constant.ApplicationConstant.HttpHeader;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,30 +40,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String jwt = authHeader.substring(HttpAttribute.AUTHORIZATION_PREFIX.length());
-            Long userId = jwtService.getUserIdFromToken(jwt);
+            Claims claims = jwtService.extractAndValidateClaims(jwt);
+            Long userId = Long.valueOf(claims.getSubject());
+            String jti = claims.getId();
 
-            if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserById(userId);
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (!tokenBlacklistService.isBlacklisted(jti)) {
+                    UserDetails userDetails = userDetailsService.loadUserById(userId);
 
-                if (jwtService.validateToken(jwt, userId)) {
-                    String jti = jwtService.getJtiFromToken(jwt);
-                    if (tokenBlacklistService.isBlacklisted(jti)) {
-                        filterChain.doFilter(request, response);
-                        return;
+                    if (userDetails.isEnabled()) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
-
-                    if (!userDetails.isEnabled()) {
-                        filterChain.doFilter(request, response);
-                        return;
-                    }
-
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
         } catch (Exception e) {

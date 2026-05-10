@@ -9,6 +9,7 @@ import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.UserResponse;
 import com.leman.chatservice.dto.response.UserSearchResponse;
 import com.leman.chatservice.entity.User;
+import java.time.Instant;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
@@ -28,5 +29,12 @@ public interface UserMapper {
     UserResponse toResponse(User user);
 
     PageableResponse<UserSearchResponse> toPageableResponse(Page<User> page);
+
+    default UserResponse toDetailResponse(User user, boolean online, Instant lastSeen) {
+        UserResponse response = toResponse(user);
+        response.setOnline(online);
+        response.setLastSeen(lastSeen);
+        return response;
+    }
 
 }

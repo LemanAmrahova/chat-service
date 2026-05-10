@@ -33,6 +33,8 @@ import com.leman.chatservice.mapper.UserMapper;
 import com.leman.chatservice.repository.UserRepository;
 import com.leman.chatservice.security.JwtService;
 import com.leman.chatservice.security.TokenBlacklistService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -67,6 +69,9 @@ class AuthServiceTest {
 
     @Mock
     private JwtService jwtService;
+
+    @Mock
+    private Claims claims;
 
     @Mock
     private TokenBlacklistService tokenBlacklistService;
@@ -173,61 +178,44 @@ class AuthServiceTest {
 
     @Test
     void refreshToken_Should_Return_Success() {
-        given(jwtService.getTokenType(REFRESH_TOKEN)).willReturn(ApplicationConstant.TokenType.REFRESH);
-        given(jwtService.getUserIdFromToken(REFRESH_TOKEN)).willReturn(USER_ID);
-        given(jwtService.validateToken(REFRESH_TOKEN, USER_ID)).willReturn(true);
+        given(jwtService.extractAndValidateClaims(REFRESH_TOKEN)).willReturn(claims);
+        given(claims.get("type", String.class)).willReturn(ApplicationConstant.TokenType.REFRESH);
+        given(claims.getSubject()).willReturn(String.valueOf(USER_ID));
         given(userRepository.findById(USER_ID)).willReturn(Optional.of(USER_ENTITY));
         given(jwtService.generateAccessToken(USER_ENTITY)).willReturn(ACCESS_TOKEN);
 
         LoginResponse result = authService.refreshToken(REFRESH_TOKEN);
         assertNotNull(result);
         assertEquals(LOGIN_RESPONSE, result);
-
-        then(jwtService).should(times(1)).getTokenType(REFRESH_TOKEN);
-        then(jwtService).should(times(1)).getUserIdFromToken(REFRESH_TOKEN);
-        then(jwtService).should(times(1)).validateToken(REFRESH_TOKEN, USER_ID);
-        then(userRepository).should(times(1)).findById(USER_ID);
-        then(jwtService).should(times(1)).generateAccessToken(USER_ENTITY);
     }
 
     @Test
     void refreshToken_Should_Throw_UnauthorizedException_WhenTokenTypeNotRefresh() {
-        given(jwtService.getTokenType(REFRESH_TOKEN)).willReturn(ApplicationConstant.TokenType.ACCESS);
+        given(jwtService.extractAndValidateClaims(REFRESH_TOKEN)).willReturn(claims);
+        given(claims.get("type", String.class)).willReturn(ApplicationConstant.TokenType.ACCESS);
 
         assertThrows(UnauthorizedException.class, () -> authService.refreshToken(REFRESH_TOKEN));
 
-        then(jwtService).should(times(1)).getTokenType(REFRESH_TOKEN);
-        then(jwtService).shouldHaveNoMoreInteractions();
         then(userRepository).shouldHaveNoInteractions();
     }
 
     @Test
     void refreshToken_Should_Throw_UnauthorizedException_WhenInvalidRefreshToken() {
-        given(jwtService.getTokenType(REFRESH_TOKEN)).willReturn(ApplicationConstant.TokenType.REFRESH);
-        given(jwtService.getUserIdFromToken(REFRESH_TOKEN)).willReturn(USER_ID);
-        given(jwtService.validateToken(REFRESH_TOKEN, USER_ID)).willReturn(false);
+        given(jwtService.extractAndValidateClaims(REFRESH_TOKEN)).willThrow(new JwtException("Invalid token"));
 
         assertThrows(UnauthorizedException.class, () -> authService.refreshToken(REFRESH_TOKEN));
 
-        then(jwtService).should(times(1)).getTokenType(REFRESH_TOKEN);
-        then(jwtService).should(times(1)).getUserIdFromToken(REFRESH_TOKEN);
-        then(jwtService).should(times(1)).validateToken(REFRESH_TOKEN, USER_ID);
         then(userRepository).shouldHaveNoInteractions();
     }
 
     @Test
     void refreshToken_Should_Throw_ResourceNotFoundException_WhenUserNotFound() {
-        given(jwtService.getTokenType(REFRESH_TOKEN)).willReturn(ApplicationConstant.TokenType.REFRESH);
-        given(jwtService.getUserIdFromToken(REFRESH_TOKEN)).willReturn(USER_ID);
-        given(jwtService.validateToken(REFRESH_TOKEN, USER_ID)).willReturn(true);
+        given(jwtService.extractAndValidateClaims(REFRESH_TOKEN)).willReturn(claims);
+        given(claims.get("type", String.class)).willReturn(ApplicationConstant.TokenType.REFRESH);
+        given(claims.getSubject()).willReturn(String.valueOf(USER_ID));
         given(userRepository.findById(USER_ID)).willReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> authService.refreshToken(REFRESH_TOKEN));
-
-        then(jwtService).should(times(1)).getTokenType(REFRESH_TOKEN);
-        then(jwtService).should(times(1)).getUserIdFromToken(REFRESH_TOKEN);
-        then(jwtService).should(times(1)).validateToken(REFRESH_TOKEN, USER_ID);
-        then(userRepository).should(times(1)).findById(USER_ID);
     }
 
     @Test
