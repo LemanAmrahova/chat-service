@@ -1,5 +1,6 @@
 package com.leman.chatservice.controller;
 
+import static com.leman.chatservice.constant.TestConstant.ID;
 import static com.leman.chatservice.constant.UserTestConstant.PASSWORD_CHANGE_REQUEST;
 import static com.leman.chatservice.constant.UserTestConstant.USERNAME;
 import static com.leman.chatservice.constant.UserTestConstant.USER_ID;
@@ -77,6 +78,19 @@ class UserControllerTest extends BaseControllerTest {
         given(userService.findUserById(USER_ID)).willReturn(USER_RESPONSE);
 
         mockMvc.perform(get(BASE_PATH + "/me")
+                        .with(authentication(new UsernamePasswordAuthenticationToken(
+                                USER_PRINCIPAL, null, USER_PRINCIPAL.getAuthorities()))))
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseTester.write(USER_RESPONSE).getJson()));
+
+        then(userService).should(times(1)).findUserById(USER_ID);
+    }
+
+    @Test
+    void getUserById_ShouldReturn_Success() throws Exception {
+        given(userService.findUserById(USER_ID)).willReturn(USER_RESPONSE);
+
+        mockMvc.perform(get(BASE_PATH + "/" + ID)
                         .with(authentication(new UsernamePasswordAuthenticationToken(
                                 USER_PRINCIPAL, null, USER_PRINCIPAL.getAuthorities()))))
                 .andExpect(status().isOk())
