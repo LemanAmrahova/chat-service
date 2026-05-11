@@ -31,7 +31,9 @@ import com.leman.chatservice.exception.DuplicateResourceException;
 import com.leman.chatservice.exception.ResourceNotFoundException;
 import com.leman.chatservice.mapper.UserMapper;
 import com.leman.chatservice.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -234,6 +236,29 @@ class UserServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> userService.deleteUser(USER_ID));
 
         then(userRepository).should(times(1)).findById(USER_ID);
+    }
+
+    @Test
+    void findUsersByIds_Should_Return_Success() {
+        Set<Long> ids = Set.of(USER_ID);
+        User userEntity = UserTestConstant.userEntity();
+        given(userRepository.findAllById(ids)).willReturn(List.of(userEntity));
+
+        List<User> result = userService.findUsersByIds(ids);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+
+        then(userRepository).should(times(1)).findAllById(ids);
+    }
+
+    @Test
+    void findUsersByIds_Should_Throw_ResourceNotFoundException_WhenUserNotFound() {
+        Set<Long> ids = Set.of(USER_ID, 2L);
+        given(userRepository.findAllById(ids)).willReturn(List.of(UserTestConstant.userEntity()));
+
+        assertThrows(ResourceNotFoundException.class, () -> userService.findUsersByIds(ids));
+
+        then(userRepository).should(times(1)).findAllById(ids);
     }
 
 }
