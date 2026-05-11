@@ -3,6 +3,8 @@ package com.leman.chatservice.entity;
 import com.leman.chatservice.enums.RoomType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,5 +39,9 @@ public class Room extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean inviteLinkEnabled = false;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<RoomMember> members = new HashSet<>();
 
 }

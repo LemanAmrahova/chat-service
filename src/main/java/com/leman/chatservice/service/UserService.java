@@ -20,6 +20,8 @@ import com.leman.chatservice.mapper.UserMapper;
 import com.leman.chatservice.repository.UserRepository;
 import com.leman.chatservice.specification.UserSpecification;
 import com.leman.chatservice.util.PaginationUtil;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -115,6 +117,14 @@ public class UserService {
         if (currentPassword.equals(newPassword)) {
             throw BadRequestException.of(SAME_PASSWORD_ERROR_MESSAGE);
         }
+    }
+
+    List<User> findUsersByIds(Set<Long> ids) {
+        List<User> users = userRepository.findAllById(ids);
+        if (users.size() != ids.size()) {
+            throw ResourceNotFoundException.of("User", "ids", ids);
+        }
+        return users;
     }
 
 }
