@@ -3,6 +3,8 @@ package com.leman.chatservice.controller;
 import static org.springframework.http.HttpStatus.CREATED;
 
 import com.leman.chatservice.dto.request.RoomCreateRequest;
+import com.leman.chatservice.dto.request.RoomFilterRequest;
+import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.RoomResponse;
 import com.leman.chatservice.security.UserPrincipal;
 import com.leman.chatservice.service.RoomService;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +31,12 @@ public class RoomController {
     public ResponseEntity<RoomResponse> create(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                @RequestBody @Valid RoomCreateRequest request) {
         return ResponseEntity.status(CREATED).body(roomService.createRoom(request, userPrincipal.getUser()));
+    }
+
+    @GetMapping
+    public ResponseEntity<PageableResponse<RoomResponse>> findAll(@AuthenticationPrincipal UserPrincipal principal,
+                                                                  RoomFilterRequest request) {
+        return ResponseEntity.ok(roomService.findAllRooms(request, principal.getUser().getId()));
     }
 
 }

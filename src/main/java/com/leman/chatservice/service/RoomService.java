@@ -1,6 +1,8 @@
 package com.leman.chatservice.service;
 
 import com.leman.chatservice.dto.request.RoomCreateRequest;
+import com.leman.chatservice.dto.request.RoomFilterRequest;
+import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.RoomResponse;
 import com.leman.chatservice.entity.Room;
 import com.leman.chatservice.entity.User;
@@ -8,9 +10,11 @@ import com.leman.chatservice.enums.MemberRole;
 import com.leman.chatservice.exception.BadRequestException;
 import com.leman.chatservice.mapper.RoomMapper;
 import com.leman.chatservice.repository.RoomRepository;
+import com.leman.chatservice.util.PaginationUtil;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +40,15 @@ public class RoomService {
 
         log.info("Room created successfully with ID: {}", saved.getId());
         return roomMapper.toResponse(saved, creator.getId());
+    }
+
+    public PageableResponse<RoomResponse> findAllRooms(RoomFilterRequest request, Long userId) {
+        Pageable pageable = PaginationUtil.createPageable(request);
+
+        return roomMapper.toPageableResponse(
+                roomRepository.findAllByMember(userId, request.getName(), request.getType(), pageable)
+                        .map(room -> roomMapper.toResponse(room, userId))
+        );
     }
 
     private Room buildRoom(RoomCreateRequest request, User creator) {

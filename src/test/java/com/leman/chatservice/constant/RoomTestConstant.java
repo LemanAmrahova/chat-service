@@ -1,6 +1,8 @@
 package com.leman.chatservice.constant;
 
 import com.leman.chatservice.dto.request.RoomCreateRequest;
+import com.leman.chatservice.dto.request.RoomFilterRequest;
+import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.RoomResponse;
 import com.leman.chatservice.entity.User;
 import com.leman.chatservice.enums.RoomType;
@@ -29,6 +31,11 @@ public final class RoomTestConstant {
             .memberIds(Set.of(CREATOR_ID))
             .build();
 
+    public static final RoomFilterRequest ROOM_FILTER_REQUEST = RoomFilterRequest.builder()
+            .page(0)
+            .size(10)
+            .build();
+
     public static final RoomResponse ROOM_RESPONSE = RoomResponse.builder()
             .id(ROOM_ID)
             .name(ROOM_NAME)
@@ -36,6 +43,17 @@ public final class RoomTestConstant {
             .inviteLinkEnabled(false)
             .members(List.of())
             .createdAt(CREATED_AT)
+            .build();
+
+    public static final PageableResponse<RoomResponse> PAGEABLE_RESPONSE = PageableResponse.<RoomResponse>builder()
+            .content(List.of(ROOM_RESPONSE))
+            .page(0)
+            .size(10)
+            .totalElements(1)
+            .totalPages(1)
+            .first(true)
+            .last(true)
+            .empty(false)
             .build();
 
     public static User creatorEntity() {
