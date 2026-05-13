@@ -44,4 +44,5 @@ public class Room extends BaseEntity {
     @Builder.Default
     private Set<RoomMember> members = new HashSet<>();
 
+    // add isActive?? Think about that.
 }

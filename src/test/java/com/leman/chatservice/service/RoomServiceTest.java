@@ -1,8 +1,10 @@
 package com.leman.chatservice.service;
 
+import static com.leman.chatservice.constant.RoomTestConstant.CREATOR_ID;
 import static com.leman.chatservice.constant.RoomTestConstant.MEMBER_ID;
 import static com.leman.chatservice.constant.RoomTestConstant.ROOM_CREATE_REQUEST;
 import static com.leman.chatservice.constant.RoomTestConstant.ROOM_CREATE_REQUEST_WITH_CREATOR;
+import static com.leman.chatservice.constant.RoomTestConstant.ROOM_FILTER_REQUEST;
 import static com.leman.chatservice.constant.RoomTestConstant.creatorEntity;
 import static com.leman.chatservice.constant.RoomTestConstant.memberEntity;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,8 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
+import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.RoomResponse;
 import com.leman.chatservice.entity.Room;
 import com.leman.chatservice.exception.BadRequestException;
@@ -27,6 +31,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 
 @ExtendWith(MockitoExtension.class)
 class RoomServiceTest {
@@ -73,6 +78,18 @@ class RoomServiceTest {
                 () -> roomService.createRoom(ROOM_CREATE_REQUEST, creatorEntity()));
 
         then(roomRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void findAllRooms_Should_Return_Success() {
+        Page<Room> roomPage = mock(Page.class);
+        given(roomPage.map(any())).willReturn(Page.empty());
+        given(roomRepository.findAllByMember(any(), any(), any(), any())).willReturn(roomPage);
+
+        PageableResponse<RoomResponse> result = roomService.findAllRooms(ROOM_FILTER_REQUEST, CREATOR_ID);
+        assertNotNull(result);
+
+        then(roomRepository).should(times(1)).findAllByMember(any(), any(), any(), any());
     }
 
 }

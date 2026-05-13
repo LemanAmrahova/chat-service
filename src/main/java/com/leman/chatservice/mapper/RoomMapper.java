@@ -5,6 +5,7 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 import static org.mapstruct.ReportingPolicy.IGNORE;
 
 import com.leman.chatservice.dto.request.RoomCreateRequest;
+import com.leman.chatservice.dto.response.PageableResponse;
 import com.leman.chatservice.dto.response.RoomResponse;
 import com.leman.chatservice.dto.response.UserSearchResponse;
 import com.leman.chatservice.entity.Room;
@@ -14,6 +15,7 @@ import com.leman.chatservice.enums.MemberRole;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.data.domain.Page;
 
 @Mapper(
         componentModel = SPRING,
@@ -37,6 +39,19 @@ public interface RoomMapper {
         response.setInviteLink(isOwner(room, requesterId) ? room.getInviteLink() : null);
         response.setMembers(mapMembers(room));
         return response;
+    }
+
+    default PageableResponse<RoomResponse> toPageableResponse(Page<RoomResponse> page) {
+        return PageableResponse.<RoomResponse>builder()
+                .content(page.getContent())
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .empty(page.isEmpty())
+                .build();
     }
 
     default RoomMember toMemberEntity(Room room, User user, MemberRole role) {
